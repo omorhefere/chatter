@@ -17,3 +17,11 @@ exports.saveMsg = function(data, cb){
 		cb(err);
 	});
 };
+
+
+exports.getOldMsgs = function(limit, cb){
+	var query = Chat.find({});
+	query.sort('-created').limit(limit).exec(function(err, docs){
+		cb(err, docs);
+	});
+}

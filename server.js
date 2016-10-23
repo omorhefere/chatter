@@ -1,7 +1,3 @@
-// server.js
-
-// set up ======================================================================
-// get all the tools we need
 var express  = require('express');
 var app      = express();
 var server = require('http').Server(app);
@@ -35,20 +31,22 @@ app.set('view engine', 'ejs'); // set up ejs for templating
 
 
 // required for passport
-app.use(session({ secret: 'ilovescotchscotchyscotchscotch' })); // session secret
+app.use(session({ secret: 'secret' })); // session secret
 app.use(passport.initialize());
 app.use(passport.session()); // persistent login sessions
 app.use(flash()); // use connect-flash for flash messages stored in session
 app.use(express.static(__dirname + '/views'));
+app.use(express.static(__dirname + '/public'));
 // socket.io
 io.on('connection', function (socket) {
     console.log('a user connected');
 
     socket.on('chat message', function(msg){
+        console.log('a use connected');
         var name = "efe";
         chatdb.saveMsg({name: name, msg: msg}, function(err){
             if(err) throw err;
-            io.emit('message', msg);
+            io.emit('chat message', msg);
         });
     });
 
