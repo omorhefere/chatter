@@ -1,31 +1,77 @@
-.bubble{
-	background-color: blue;
-
-	margin-left: 20%;
-	border-radius: 30px;
-	font-size: 200%;
-	color: white;
-	padding: 5px;
-	display: inline-block;
-	height: auto;
-	width: 250px;
-	margin-top: 2%
-
-
+.panel {
+    border: 0;
+    border-color: white;
 }
-.messages{
-	text-align: center;
-	max-width: 30%;
-	margin-left:30%;
-	overflow: scroll;
-
+.panel-heading{
+    border:0;
+}
+.panel-body{
+    border:0;
+    overflow-y: scroll;
+}
+.panel-footer{
+    border: 0;
+}
+.row{
+    border:0;
 }
 
-* { margin: 0; padding: 0; box-sizing: border-box; }
-body { font: 13px Helvetica, Arial; }
-form { background: #000; padding: 3px; position: fixed; bottom: 0; width: 100%; }
-form input { border: 0; padding: 10px; width: 90%; margin-right: .5%; }
-form button { width: 9%; background: rgb(130, 224, 255); border: none; padding: 10px; }
-#messages { list-style-type: none; margin: 0; padding: 0; }
-#messages li { padding: 5px 10px; }
-#messages li:nth-child(odd) { background: #eee; }
+.message-bubble {
+    padding: 10px 0px 10px 0px;
+    width: 80%;
+    margin-left: 10%
+}
+
+.row:nth-child(even) {
+    background-color: #ccc;
+ }
+
+.message-bubble > *{
+
+    padding-left: 10px;
+    margin-left: 20%
+}
+row {
+    width: 80%;
+    margin-left: 10%
+}
+.panel-body {
+    background-color: white;
+    overflow-y: scroll;
+    border-style: hidden;
+}
+
+.panel-heading {
+    background-color: #3d6da7!important;
+    color: white !important;
+}
+
+form {
+     width: 100%;
+ }
+
+.container {
+    border:0;
+}
+
+.container1 {
+    background-color: white;
+    overflow-y: scroll;
+    border-style: none;
+}
+
+p {
+    width: 80%;
+    margin-left: 2%
+}
+
+.panel-footer {
+    background-color: white;
+    position: fixed;
+}
+
+.panel-footer{
+    position: fixed; bottom: 0;
+    margin-left: -1.5%;
+    width: 95%;
+}

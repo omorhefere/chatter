@@ -33,18 +33,22 @@ app.use(bodyParser()); // get information from html forms
 
 app.set('view engine', 'ejs'); // set up ejs for templating
 var mongoStore = new MongoStore({
-  mongooseConnection: db.connection,
+    mongooseConnection: db.connection,
 });
 app.use(session({
-  secret: 'secret',
-  clear_interval: 900,
-  cookie: { maxAge: 2 * 60 * 60 * 1000 },
-  store: mongoStore,
+    secret: 'secret',
+    clear_interval: 900,
+    cookie: {
+        maxAge: 2 * 60 * 60 * 10000
+    },
+    store: mongoStore,
 }));
 
 
 // required for passport
-app.use(session({ secret: 'secret' })); // session secret
+app.use(session({
+    secret: 'secret'
+})); // session secret
 app.use(passport.initialize());
 app.use(passport.session()); // persistent login sessions
 app.use(flash()); // use connect-flash for flash messages stored in session
@@ -86,7 +90,7 @@ io.use(function(socket, next) {
             });
         });
     });
-  });
+});
 
 // socket.io
 io.on('connection', function(socket) {
@@ -94,15 +98,19 @@ io.on('connection', function(socket) {
     socket.on('chat message', function(msg) {
         console.log(socket.request.user.facebook.name || socket.request.user.local.email);
         var name = socket.request.user.facebook.name || socket.request.user.local.email;
+        var data = {
+            userid: name,
+            msg: msg,
+        };
+        console.log(data);
         chatdb.saveMsg({
             name: name,
             msg: msg
         }, function(err) {
             if (err) throw err;
-            io.emit('chat message', msg);
+            io.emit('chat message', data);
         });
     });
-
     socket.on('disconnect', function() {
         console.log('user disconnected');
     });

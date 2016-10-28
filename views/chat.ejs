@@ -1,27 +1,73 @@
 <!doctype html>
 <html>
-  <head>
-    <title>chat message</title>
 
-    <link rel="stylesheet" href="/css/chat.css" type="text/css"/>
-  </head>
-  <body>
-    <div class="messages"><br/><br/><br/><br/><br/><br/> </div>
-    <form action="">
-      <input id="m" autocomplete="off" /><button>Send</button>
-    </form>
-    <script src="https://cdn.socket.io/socket.io-1.3.7.js"></script>
-    <script src="http://code.jquery.com/jquery-1.11.1.js"></script>
+<head>
+    <title>chat message</title>
+    <link rel="stylesheet" href="//netdna.bootstrapcdn.com/bootstrap/3.0.2/css/bootstrap.min.css">
+    <!-- load bootstrap css -->
+    <link rel="stylesheet" href="//netdna.bootstrapcdn.com/font-awesome/4.0.3/css/font-awesome.min.css">
+    <!-- load fontawesome -->
+    <link rel="stylesheet" href="/css/chat.css" type="text/css" />
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.1.1/jquery.min.js"></script>
     <script>
-      var socket = io();
-      $('form').submit(function(){
-        socket.emit('chat message', $('#m').val());
-        $('#m').val('');
-        return false;
-      });
-      socket.on('chat message', function(msg){
-        $('.messages').append($('<div class=bubble><br/>').text(msg));
-      });
+        $(document).ready(function() {
+
+                $('.panel-body').hide();
+
+
+
+        });
     </script>
-  </body>
+
+
+</head>
+
+<body>
+    <div class="container">
+        <div class="row">
+            <div class="panel panel-default">
+                <div class="panel-heading">Panel heading without title</div>
+                <div class="panel-body">
+                    <div class="container1">
+                    </div>
+                </div>
+                <div class="panel-footer">
+                    <form action="" class="input-group">
+                        <input id="m" type="text" class="form-control">
+                        <span class="input-group-btn">
+                            <button class="btn btn-default" type="button">Send</button>
+                        </span>
+                    </form>
+                </div>
+
+            </div>
+        </div>
+    </div>
+
+    <script src="https://cdn.socket.io/socket.io-1.3.7.js"></script>
+    <script>
+        var socket = io();
+        $
+        $('form').submit(function() {
+
+            socket.emit('chat message', $('#m').val());
+            $('#m').val('');
+            return false;
+        });
+        socket.on('chat message', function(data) {
+            $('.panel-body').show();
+            var text = data.msg;
+            var currentUser = data.userid;
+            var chatBubble = $('<div class=row message-bubble>');
+            var name = chatBubble.append($('<p class=text-muted></p>').text(currentUser));
+            var message = name.append($('<p></p>').text(text));
+            var container = $('.container1');
+
+
+            container.append(message);
+            container
+        });
+    </script>
+</body>
+
 </html>
