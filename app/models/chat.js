@@ -1,8 +1,6 @@
 var mongoose = require('mongoose');
 var bcrypt   = require('bcrypt-nodejs');
 
-
-
 var chatSchema = mongoose.Schema({
 	name: String,
 	msg: String,

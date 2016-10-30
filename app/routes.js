@@ -28,10 +28,10 @@ module.exports = function(app, passport) {
 		});
 	});
 	app.get('/chat', function(req, res) {
-		console.log(req.session);
+	
 		res.render('chat.ejs', {
 			user : req.user,
-			
+
 		});
 	});
 

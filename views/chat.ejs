@@ -12,7 +12,7 @@
     <script>
         $(document).ready(function() {
 
-                $('.panel-body').hide();
+            $('.panel-body').hide();
 
 
 
@@ -33,7 +33,7 @@
                 </div>
                 <div class="panel-footer">
                     <form action="" class="input-group">
-                        <input id="m" type="text" class="form-control">
+                        <input id="m" type="text" class="form-control" required>
                         <span class="input-group-btn">
                             <button class="btn btn-default" type="button">Send</button>
                         </span>
@@ -47,25 +47,40 @@
     <script src="https://cdn.socket.io/socket.io-1.3.7.js"></script>
     <script>
         var socket = io();
-        $
+        var container = $('.container1');
+        var chatBubble = $('<div class=row message-bubble>');
+
+
+        socket.on('load message', function(docs) {
+            $('.panel-body').show();
+            for (var i = docs.length-1; i >= 0; i--) {
+                var text1 = docs[i].msg;
+                var currentUser1 = docs[i].name;
+                var name1 = chatBubble.append($('<p class=text-muted></p>').text(currentUser1));
+                var message1 = name1.append($('<p></p>').text(text1));
+
+                container.append(message1);
+        }
+
+        });
+
         $('form').submit(function() {
 
             socket.emit('chat message', $('#m').val());
             $('#m').val('');
             return false;
         });
+
         socket.on('chat message', function(data) {
             $('.panel-body').show();
             var text = data.msg;
             var currentUser = data.userid;
-            var chatBubble = $('<div class=row message-bubble>');
+
             var name = chatBubble.append($('<p class=text-muted></p>').text(currentUser));
             var message = name.append($('<p></p>').text(text));
-            var container = $('.container1');
-
 
             container.append(message);
-            container
+
         });
     </script>
 </body>

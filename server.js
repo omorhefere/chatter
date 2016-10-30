@@ -24,6 +24,7 @@ var chatdb = require('./app/models/chat.js');
 // NOTE: This might need to be put into a callback/promise inside an initialize function
 var db = mongoose.connect(configDB.url); // connect to our database
 
+
 require('./config/passport')(passport); // pass passport for configuration
 
 // set up our express application
@@ -43,7 +44,6 @@ app.use(session({
     },
     store: mongoStore,
 }));
-
 
 // required for passport
 app.use(session({
@@ -94,15 +94,18 @@ io.use(function(socket, next) {
 
 // socket.io
 io.on('connection', function(socket) {
+    chatdb.getOldMsgs(5, function(err, docs){
+        socket.emit('load message', docs);
+  });
 
     socket.on('chat message', function(msg) {
-        console.log(socket.request.user.facebook.name || socket.request.user.local.email);
+
         var name = socket.request.user.facebook.name || socket.request.user.local.email;
         var data = {
             userid: name,
             msg: msg,
         };
-        console.log(data);
+
         chatdb.saveMsg({
             name: name,
             msg: msg
