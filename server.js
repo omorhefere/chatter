@@ -91,12 +91,15 @@ io.use(function(socket, next) {
         });
     });
 });
-
+var connections = [];
 // socket.io
 io.on('connection', function(socket) {
-    chatdb.getOldMsgs(5, function(err, docs){
+    connections.push(socket);
+    console.log(connections.length)
+    chatdb.getOldMsgs(50, function(err, docs){
         socket.emit('load message', docs);
   });
+
 
     socket.on('chat message', function(msg) {
 

@@ -12,10 +12,11 @@
 	<div class="container">
 
 		<div class="page-header text-center">
-			<h1>Chatter</h1>
+			<h1>Chattr</h1>
 			<br>
 			<a href="/logout" class="btn btn-default btn-sm">Logout</a>
 			<a href="/profile" class="btn btn-default btn-sm">Profile</a>
+			<a href="/create" class="btn btn-default btn-sm">Make Room</a>
 
 		</div>
 
@@ -27,7 +28,7 @@
 			<div class="well">
 
 					<p>
-						<strong>topic</strong><br>
+						<strong>topic with socket</strong><br>
 						<strong>description</strong><br>
 						<strong>Members</strong><br>
 						<a href="/chat" class="btn btn-default btn-sm">Join</a>
@@ -35,5 +36,20 @@
 
 			</div>
 		</div>
+		<!-- LOCAL INFORMATION -->
+		<% for(var i=0; i < rooms.length; i++) { %>
+			<div class="col-sm-3">
+				<div class="well">
+
+						<p>
+							<strong>topic</strong>:<%=rooms[i].name%><br>
+							<strong>description</strong>:<%=rooms[i].topic%><br>
+							<strong>Members</strong>:<%=rooms[i].participants%><br>
+
+						</p>
+
+				</div>
+			</div>
+		<% } %>
 </body>
 </html>
