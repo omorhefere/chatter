@@ -1,13 +1,18 @@
 <!doctype html>
 <html>
+
 <head>
 	<title>Home Page</title>
 	<link rel="stylesheet" href="//netdna.bootstrapcdn.com/bootstrap/3.0.2/css/bootstrap.min.css">
 	<link rel="stylesheet" href="//netdna.bootstrapcdn.com/font-awesome/4.0.3/css/font-awesome.min.css">
 	<style>
-		body 		{ padding-top:80px; word-wrap:break-word; }
+		body {
+			padding-top: 80px;
+			word-wrap: break-word;
+		}
 	</style>
 </head>
+
 <body>
 	<div class="container">
 
@@ -21,35 +26,50 @@
 		</div>
 
 		<div class="row">
-	<div class="row">
+			<div class="row">
 
-		<!-- LOCAL INFORMATION -->
-		<div class="col-sm-3">
-			<div class="well">
-
-					<p>
-						<strong>topic with socket</strong><br>
-						<strong>description</strong><br>
-						<strong>Members</strong><br>
-						<a href="/chat" class="btn btn-default btn-sm">Join</a>
-					</p>
-
-			</div>
-		</div>
-		<!-- LOCAL INFORMATION -->
-		<% for(var i=0; i < rooms.length; i++) { %>
-			<div class="col-sm-3">
-				<div class="well">
+				<!-- LOCAL INFORMATION -->
+				<div class="col-sm-3">
+					<div class="well">
 
 						<p>
-							<strong>topic</strong>:<%=rooms[i].name%><br>
-							<strong>description</strong>:<%=rooms[i].topic%><br>
-							<strong>Members</strong>:<%=rooms[i].participants%><br>
-
+							<strong>topic with socket</strong><br>
+							<strong>description</strong><br>
+							<strong>Members</strong><br>
+							<a href="/chat" class="btn btn-default btn-sm">Join</a>
 						</p>
 
+					</div>
 				</div>
-			</div>
-		<% } %>
+				<!-- LOCAL INFORMATION -->
+				<% for(var i=0; i < rooms.length; i++) { %>
+					<div class="col-sm-3">
+						<div class="well">
+
+							<p>
+								<strong>topic</strong>:
+								<%=rooms[i].name%><br>
+									<strong>description</strong>:
+									<%=rooms[i].topic%><br>
+										<strong>Members</strong>:
+										<%=rooms[i].participants%><br>
+											<a href="/chat" class="btn btn-default btn-sm" value="<%=rooms[i].name%>">Join</a>
+
+							</p>
+
+						</div>
+					</div>
+					<% } %>
+						<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.1.1/jquery.min.js"></script>
+						<script src="https://cdn.socket.io/socket.io-1.3.7.js"></script>
+						<script>
+							var socket = io();
+
+							$('.btn.btn-default.btn-sm').click(function() {
+								var value = $(this).attr('value');
+								socket.emit('join', value);
+							});
+						</script>
 </body>
+
 </html>

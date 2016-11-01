@@ -31,6 +31,7 @@ module.exports = function(app, passport) {
             } else {
                 var newRoom = new Room();
                 newRoom.name = req.body.name;
+                newRoom.user - req.user;
                 newRoom.topic = req.body.topic;
                 newRoom.participants = req.body.participants;
                 newRoom.type = req.body.type;
@@ -67,7 +68,7 @@ module.exports = function(app, passport) {
         Room.find({})
         .sort('-created')
         .exec(function(err, rooms) {
-            console.log(rooms)
+        
 
             if (err)
                 res.send(err);

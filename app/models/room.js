@@ -3,6 +3,7 @@ var bcrypt   = require('bcrypt-nodejs');
 
 var roomSchema = mongoose.Schema({
 	name: String,
+  user: String,
   topic: String,
   participants: Number,
   type: String,

@@ -94,10 +94,27 @@ io.use(function(socket, next) {
 var connections = [];
 // socket.io
 io.on('connection', function(socket) {
-    connections.push(socket);
-    console.log(connections.length)
+
     chatdb.getOldMsgs(50, function(err, docs){
         socket.emit('load message', docs);
+  });
+
+  socket.on('join', function(room){
+        var name = socket.request.user.facebook.name || socket.request.user.local.email;
+
+
+		// store the room name in the socket session for this client
+		    socket.room = room;
+
+
+		// send client to room 1
+		    socket.join(room);
+
+
+        io.sockets.in(room).emit('chat message', { userid: name, msg: name+ 'has entered this chat' } ) ;
+        connections.push(socket);
+
+
   });
 
 
