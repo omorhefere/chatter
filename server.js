@@ -92,50 +92,43 @@ io.use(function(socket, next) {
     });
 });
 var connections = [];
+
 // socket.io
 io.on('connection', function(socket) {
 
-    chatdb.getOldMsgs(50, function(err, docs){
-        socket.emit('load message', docs);
-  });
+    socket.on('old messages', function(room) {
 
-  socket.on('join', function(room){
-        var name = socket.request.user.facebook.name || socket.request.user.local.email;
+        messages = {
+            limit: 10,
+            room: room,
+        }
 
-
-		// store the room name in the socket session for this client
-		    socket.room = room;
-
-
-		// send client to room 1
-		    socket.join(room);
-
-
-        io.sockets.in(room).emit('chat message', { userid: name, msg: name+ 'has entered this chat' } ) ;
-        connections.push(socket);
-
-
-  });
-
-
-    socket.on('chat message', function(msg) {
-
-        var name = socket.request.user.facebook.name || socket.request.user.local.email;
-        var data = {
-            userid: name,
-            msg: msg,
-        };
-
-        chatdb.saveMsg({
-            name: name,
-            msg: msg
-        }, function(err) {
-            if (err) throw err;
-            io.emit('chat message', data);
+        chatdb.getOldMsgs(messages, function(err,docs) {
+            socket.emit('load message',docs);
         });
     });
-    socket.on('disconnect', function() {
-        console.log('user disconnected');
+
+
+    socket.on('chat message', function(data) {
+
+        var name = socket.request.user.facebook.name || socket.request.user.local.email;
+        var dataN = {
+            userid: name,
+            msg: data.msg,
+        };
+
+        socket.join(data.room);
+        chatdb.saveMsg({
+            name: name,
+            msg: data.msg,
+            room: data.room
+        }, function(err) {
+            if (err) throw err;
+            io.to(data.room).emit('chat message', dataN);
+        });
+    });
+    socket.on('disconnect', function(room) {
+        socket.leave(room);
     });
 });
 

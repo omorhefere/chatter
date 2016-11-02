@@ -11,20 +11,20 @@
     <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.1.1/jquery.min.js"></script>
     <script>
         $(document).ready(function() {
-
             $('.panel-body').hide();
 
         });
     </script>
-
-
 </head>
 
 <body>
     <div class="container">
         <div class="row">
+            <a href="/home" class="btn btn-default btn-sm back">home</a>
             <div class="panel panel-default">
-                <div class="panel-heading">Panel heading without title</div>
+                <div class="panel-heading" id='name' value='<%=name%>'>
+                    <%=name%>
+                </div>
                 <div class="panel-body">
                     <div class="container1">
                     </div>
@@ -47,24 +47,33 @@
         var socket = io();
         var container = $('.container1');
         var chatBubble = $('<div class=row message-bubble>');
+        var room = $('.panel-heading').attr('value');
+        socket.emit('old messages', room);
+        socket.emit('disconnect', room);
 
 
         socket.on('load message', function(docs) {
             $('.panel-body').show();
-            for (var i = docs.length-1; i >= 0; i--) {
+            console.log(docs.length);
+            for (var i = docs.length - 1; i >= 0; i--) {
+                console.log(docs[i]);
                 var text1 = docs[i].msg;
                 var currentUser1 = docs[i].name;
                 var name1 = chatBubble.append($('<p class=text-muted></p>').text(currentUser1));
                 var message1 = name1.append($('<p></p>').text(text1));
-
                 container.append(message1);
-        }
+            }
+
 
         });
 
         $('form').submit(function() {
+            var dataN1 = {
+                room: room,
+                msg: $('#m').val(),
+            };
 
-            socket.emit('chat message', $('#m').val());
+            socket.emit('chat message', dataN1);
             $('#m').val('');
             return false;
         });
@@ -73,13 +82,13 @@
             $('.panel-body').show();
             var text = data.msg;
             var currentUser = data.userid;
-
             var name = chatBubble.append($('<p class=text-muted></p>').text(currentUser));
             var message = name.append($('<p></p>').text(text));
 
             container.append(message);
 
         });
+
     </script>
 </body>
 

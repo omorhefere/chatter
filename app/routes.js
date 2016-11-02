@@ -66,24 +66,27 @@ module.exports = function(app, passport) {
     app.get('/home', function(req, res) {
         //retrieve all blobs from Monogo
         Room.find({})
-        .sort('-created')
-        .exec(function(err, rooms) {
-        
+            .sort('-created')
+            .exec(function(err, rooms) {
 
-            if (err)
-                res.send(err);
-                    //respond to both HTML and JSON. JSON responses require 'Accept: application/json;' in the Request Header
+
+                if (err)
+                    res.send(err);
+                //respond to both HTML and JSON. JSON responses require 'Accept: application/json;' in the Request Header
                 res.render('home.ejs', {
-                    rooms : rooms
+                    rooms: rooms
                 });
             });
-        });
+    });
 
-    app.get('/chat', function(req, res) {
+    app.get('/chat/:id', function(req, res) {
 
-        res.render('chat.ejs', {
-            user: req.user,
+        Room.findById(req.params.id, function(error, room) {
 
+            res.render('chat.ejs', {
+                name: room.name,
+                topic: room.topic,
+            });
         });
     });
 
