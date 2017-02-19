@@ -20,10 +20,23 @@ var http = require('http').Server(app);
 var io = require('socket.io')(http);
 var chatdb = require('./app/models/chat.js');
 
+var fs = require('fs');
+var multer = require('multer');
+var Grid = require("gridfs-stream");
+
+
 // configuration ===============================================================
 // NOTE: This might need to be put into a callback/promise inside an initialize function
 var db = mongoose.connect(configDB.url); // connect to our database
-
+var storage = multer.diskStorage({
+  destination: function (req, file, cb){
+    cb(null, 'uploads/')
+  },
+  filename: function (req, file, cb) {
+    cb(null, file.originalname + '-' +Date.now())
+  }
+});
+var upload = multer({ storage: storage }).single('avatar');
 
 require('./config/passport')(passport); // pass passport for configuration
 
@@ -31,6 +44,7 @@ require('./config/passport')(passport); // pass passport for configuration
 app.use(morgan('dev')); // log every request to the console
 app.use(cookieParser()); // read cookies (needed for auth)
 app.use(bodyParser()); // get information from html forms
+
 
 app.set('view engine', 'ejs'); // set up ejs for templating
 var mongoStore = new MongoStore({
@@ -133,7 +147,8 @@ io.on('connection', function(socket) {
 });
 
 // routes ======================================================================
-require('./app/routes.js')(app, passport); // load our routes and pass in our app and fully configured passport
+require('./app/routes.js')(app, passport, upload); // load our routes and pass in our app and fully configured passport
+
 
 // launch ======================================================================
 http.listen(port);

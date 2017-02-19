@@ -1,6 +1,8 @@
 var Room = require('../app/models/room.js');
+var User = require('../app/models/user.js');
 var mongoose = require('mongoose');
-module.exports = function(app, passport) {
+
+module.exports = function(app, passport, upload) {
 
     // normal routes ===============================================================
 
@@ -11,10 +13,7 @@ module.exports = function(app, passport) {
     });
     app.get('/create', function(req, res) {
 
-        res.render('create-room.ejs', {
-
-
-        });
+        res.render('create-room.ejs', {});
 
     });
     app.post('/create', function(req, res) {
@@ -40,9 +39,7 @@ module.exports = function(app, passport) {
                 if (err) {
                     throw err;
                 }
-                res.writeHead(302, {
-                    'Location': '/home',
-                });
+                res.writeHead(302, {'Location': '/home'});
                 res.end();
             });
 
@@ -52,9 +49,8 @@ module.exports = function(app, passport) {
     // PROFILE SECTION =========================
     app.get('/profile', isLoggedIn, function(req, res) {
 
-        res.render('profile.ejs', {
-            user: req.user
-        });
+        console.log(req.user)
+        res.render('profile.ejs', {user: req.user});
     });
 
     // LOGOUT ==============================
@@ -65,18 +61,14 @@ module.exports = function(app, passport) {
 
     app.get('/home', function(req, res) {
         //retrieve all blobs from Monogo
-        Room.find({})
-            .sort('-created')
-            .exec(function(err, rooms) {
+        Room.find({}).sort('-created').exec(function(err, rooms) {
 
+            if (err)
+                res.send(err);
 
-                if (err)
-                    res.send(err);
-                //respond to both HTML and JSON. JSON responses require 'Accept: application/json;' in the Request Header
-                res.render('home.ejs', {
-                    rooms: rooms
-                });
-            });
+            //respond to both HTML and JSON. JSON responses require 'Accept: application/json;' in the Request Header
+            res.render('home.ejs', {rooms: rooms});
+        });
     });
 
     app.get('/chat/:id', function(req, res) {
@@ -85,126 +77,194 @@ module.exports = function(app, passport) {
 
             res.render('chat.ejs', {
                 name: room.name,
-                topic: room.topic,
+                topic: room.topic
             });
         });
     });
+    // image upload route
+    app.post('/photos/upload', function(req, res) {
+        upload(req, res, function(err) {
 
 
-    // =============================================================================
-    // AUTHENTICATE (FIRST LOGIN) ==================================================
-    // =============================================================================
+            if (err) {
+                res.redirect('/profile')
+                return res.send("Error uploading file");
+            } else if (req.file == null) {
 
-    // locally --------------------------------
-    // LOGIN ===============================
-    // show the login form
-    app.get('/login', function(req, res) {
-        res.render('login.ejs', {
-            message: req.flash('loginMessage')
+                res.redirect('/profile')
+            } else {
+
+                if ((facebook != null) && (local != null)) {
+                    User.findOne({
+
+                        'facebook.email': facebook
+                    }, function(err, user) {
+                        if (err) {
+                            return done(err);
+                        }
+
+                        console.log(user)
+                        user.img = req.file.path
+
+                        user.save(function(err) {
+                            if (err) {
+                                throw err;
+                            }
+
+
+                        });
+
+                    });
+                } else if ((facebook != null) && (local == null)) {
+                    User.findOne({
+
+                        'facebook.email': facebook
+                    }, function(err, user) {
+                        if (err) {
+                            return done(err);
+                        }
+
+                        console.log(user)
+                        user.img = req.file.path
+
+                        user.save(function(err) {
+                            if (err) {
+                                throw err;
+                            }
+
+
+                        });
+
+                    });
+                } else if ((facebook == null) && (local != null))  {
+                        User.findOne({
+
+                            'local.email': local
+                        }, function(err, user) {
+                            if (err) {
+                                return done(err);
+                            }
+
+                            console.log(user)
+                            user.img = req.file.path
+
+                            user.save(function(err) {
+                                if (err) {
+                                    throw err;
+                                }
+
+
+                            });
+
+                        });
+                    }
+                }
+
+            })
+            res.redirect('/profile');
+
         });
-    });
 
-    // process the login form
-    app.post('/login', passport.authenticate('local-login', {
-        successRedirect: '/home', // redirect to the secure profile section
-        failureRedirect: '/login', // redirect back to the signup page if there is an error
-        failureFlash: true // allow flash messages
-    }));
+        // =============================================================================
+        // AUTHENTICATE (FIRST LOGIN) ==================================================
+        // =============================================================================
 
-    // SIGNUP =================================
-    // show the signup form
-    app.get('/signup', function(req, res) {
-        res.render('signup.ejs', {
-            message: req.flash('loginMessage')
+        // locally --------------------------------
+        // LOGIN ===============================
+        // show the login form
+        app.get('/login', function(req, res) {
+            res.render('login.ejs', {message: req.flash('loginMessage')});
         });
-    });
 
-    // process the signup form
-    app.post('/signup', passport.authenticate('local-signup', {
-        successRedirect: '/home', // redirect to the secure profile section
-        failureRedirect: '/signup', // redirect back to the signup page if there is an error
-        failureFlash: true // allow flash messages
-    }));
+        // process the login form
+        app.post('/login', passport.authenticate('local-login', {
+            successRedirect: '/home', // redirect to the secure profile section
+            failureRedirect: '/login', // redirect back to the signup page if there is an error
+            failureFlash: true // allow flash messages
+        }));
 
-    // facebook -------------------------------
+        // SIGNUP =================================
+        // show the signup form
+        app.get('/signup', function(req, res) {
+            res.render('signup.ejs', {message: req.flash('loginMessage')});
+        });
 
-    // send to facebook to do the authentication
-    app.get('/auth/facebook', passport.authenticate('facebook', {
-        scope: 'email'
-    }));
+        // process the signup form
+        app.post('/signup', passport.authenticate('local-signup', {
+            successRedirect: '/home', // redirect to the secure profile section
+            failureRedirect: '/signup', // redirect back to the signup page if there is an error
+            failureFlash: true // allow flash messages
+        }));
 
-    // handle the callback after facebook has authenticated the user
-    app.get('/auth/facebook/callback',
-        passport.authenticate('facebook', {
+        // facebook -------------------------------
+
+        // send to facebook to do the authentication
+        app.get('/auth/facebook', passport.authenticate('facebook', {scope: 'email'}));
+
+        // handle the callback after facebook has authenticated the user
+        app.get('/auth/facebook/callback', passport.authenticate('facebook', {
             successRedirect: '/home',
             failureRedirect: '/'
         }));
 
+        // =============================================================================
+        // AUTHORIZE (ALREADY LOGGED IN / CONNECTING OTHER SOCIAL ACCOUNT) =============
+        // =============================================================================
 
-    // =============================================================================
-    // AUTHORIZE (ALREADY LOGGED IN / CONNECTING OTHER SOCIAL ACCOUNT) =============
-    // =============================================================================
-
-    // locally --------------------------------
-    app.get('/connect/local', function(req, res) {
-        res.render('connect-local.ejs', {
-            message: req.flash('loginMessage')
+        // locally --------------------------------
+        app.get('/connect/local', function(req, res) {
+            res.render('connect-local.ejs', {message: req.flash('loginMessage')});
         });
-    });
-    app.post('/connect/local', passport.authenticate('local-signup', {
-        successRedirect: '/profile', // redirect to the secure profile section
-        failureRedirect: '/connect/local', // redirect back to the signup page if there is an error
-        failureFlash: true // allow flash messages
-    }));
+        app.post('/connect/local', passport.authenticate('local-signup', {
+            successRedirect: '/profile', // redirect to the secure profile section
+            failureRedirect: '/connect/local', // redirect back to the signup page if there is an error
+            failureFlash: true // allow flash messages
+        }));
 
-    // facebook -------------------------------
+        // facebook -------------------------------
 
-    // send to facebook to do the authentication
-    app.get('/connect/facebook', passport.authorize('facebook', {
-        scope: 'email'
-    }));
+        // send to facebook to do the authentication
+        app.get('/connect/facebook', passport.authorize('facebook', {scope: 'email'}));
 
-    // handle the callback after facebook has authorized the user
-    app.get('/connect/facebook/callback',
-        passport.authorize('facebook', {
+        // handle the callback after facebook has authorized the user
+        app.get('/connect/facebook/callback', passport.authorize('facebook', {
             successRedirect: '/profile',
             failureRedirect: '/'
         }));
 
+        // =============================================================================
+        // UNLINK ACCOUNTS =============================================================
+        // =============================================================================
+        // used to unlink accounts. for social accounts, just remove the token
+        // for local account, remove email and password
+        // user account will stay active in case they want to reconnect in the future
 
-    // =============================================================================
-    // UNLINK ACCOUNTS =============================================================
-    // =============================================================================
-    // used to unlink accounts. for social accounts, just remove the token
-    // for local account, remove email and password
-    // user account will stay active in case they want to reconnect in the future
-
-    // local -----------------------------------
-    app.get('/unlink/local', function(req, res) {
-        var user = req.user;
-        user.local.email = undefined;
-        user.local.password = undefined;
-        user.save(function(err) {
-            res.redirect('/profile');
+        // local -----------------------------------
+        app.get('/unlink/local', function(req, res) {
+            var user = req.user;
+            user.local.email = undefined;
+            user.local.password = undefined;
+            user.save(function(err) {
+                res.redirect('/profile');
+            });
         });
-    });
 
-    // facebook -------------------------------
-    app.get('/unlink/facebook', function(req, res) {
-        var user = req.user;
-        user.facebook.token = undefined;
-        user.save(function(err) {
-            res.redirect('/profile');
+        // facebook -------------------------------
+        app.get('/unlink/facebook', function(req, res) {
+            var user = req.user;
+            user.facebook.token = undefined;
+            user.save(function(err) {
+                res.redirect('/profile');
+            });
         });
-    });
 
-};
+    };
 
-// route middleware to ensure user is logged in
-function isLoggedIn(req, res, next) {
+    // route middleware to ensure user is logged in
+    function isLoggedIn(req, res, next) {
 
-    if (req.isAuthenticated())
-        return next();
+        if (req.isAuthenticated())
+            return next();
 
-    res.redirect('/');
-}
+        res.redirect('/');
+    }
